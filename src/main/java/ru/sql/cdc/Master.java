@@ -71,10 +71,9 @@ public class Master {
             formatter.printHelp("java -jar Master", createOptions() );
             return;
         }
-        logger.info("Start consumer");
+        logger.info("Start producer");
         Properties properties = new Properties();
         properties.load(getClass().getClassLoader().getResourceAsStream("master.properties"));
-
 
         dburl      = cmd.hasOption("d") ? cmd.getOptionValue("d") : properties.getProperty("dburl") ;
         dblogin    = cmd.hasOption("u") ? cmd.getOptionValue("u") : properties.getProperty("dblogin");
@@ -104,16 +103,16 @@ public class Master {
 
         while(isContinue) {
             Iterator<JmsEntity> rowEntities = Utils.groupByTimeOperationTableName(selectRowEntities()).iterator();
+            logger.info("Hearbeat...");
             while(rowEntities.hasNext()) {
                 // Create a messages
                 String text = "Hello world! From: " + Thread.currentThread().getName() + " : " + this.hashCode();
                 TextMessage message = session.createTextMessage(text);
-
                 // Tell the producer to send the message
                 logger.info("Sent message: " + message.hashCode() + " : " + Thread.currentThread().getName());
                 producer.send(message);
-                sleep(30);
             }
+            sleep(30);
         }
 
         // Clean up
